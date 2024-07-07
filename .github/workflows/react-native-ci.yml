@@ -4,10 +4,10 @@ name: CI/CD for React Native
 on:
   push:
     branches:
-      - main  # Trigger on pushes to main branch
+      - master  # Trigger on pushes to main branch
   pull_request:
     branches:
-      - main  # Trigger on pull requests targeting main branch
+      - master  # Trigger on pull requests targeting main branch
 
 jobs:
   build:
