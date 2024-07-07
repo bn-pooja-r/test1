@@ -1,0 +1,31 @@
+
+name: CI/CD for React Native
+
+on:
+  push:
+    branches:
+      - main  # Trigger on pushes to main branch
+  pull_request:
+    branches:
+      - main  # Trigger on pull requests targeting main branch
+
+jobs:
+  build:
+    runs-on: macos-latest  # Use macOS runner for iOS builds, adjust for Android
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'  # Adjust Node.js version as needed
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build and test
+        run: |
+          npx react-native start --reset-cache
+          npx react-native run-ios --configuration Release
