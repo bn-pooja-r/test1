@@ -1,3 +1,9 @@
+import {
+    Text,
+    View,
+  } from 'react-native';
+
+
 const test =()=>{
     return(
         <>
