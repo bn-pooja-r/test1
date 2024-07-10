@@ -1,4 +1,19 @@
 apply plugin: "com.android.application"
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.crashlytics'
+apply plugin: 'com.google.firebase.appdistribution'
+apply plugin: 'com.google.firebase.firebase-perf'
+
+
+project.ext.envConfigFiles = [
+   productiondebug: ".env.production",
+   productionrelease: ".env.production",
+   stagingrelease: ".env.staging",
+   stagingdebug: ".env.staging"
+]
+apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
+
+
 
 import com.android.build.OutputFile
 import org.apache.tools.ant.taskdefs.condition.Os
@@ -130,10 +145,16 @@ def reactNativeArchitectures() {
 }
 
 android {
+    compileSdkVersion 33
     ndkVersion rootProject.ext.ndkVersion
 
     compileSdkVersion rootProject.ext.compileSdkVersion
-
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
     defaultConfig {
         applicationId "com.test1"
         minSdkVersion rootProject.ext.minSdkVersion
@@ -173,7 +194,21 @@ android {
             }
         }
     }
-
+    flavorDimensions "default"
+    productFlavors {
+            production {
+                minSdkVersion rootProject.ext.minSdkVersion
+                applicationId "com.test1"
+                targetSdkVersion rootProject.ext.targetSdkVersion
+                resValue "string", "build_config_package", "com.test1"
+            }
+            staging {
+                minSdkVersion rootProject.ext.minSdkVersion
+                applicationId "com.teststaging"
+                targetSdkVersion rootProject.ext.targetSdkVersion
+                resValue "string", "build_config_package", "com.teststaging"
+            }
+        }
     if (isNewArchitectureEnabled()) {
         // We configure the NDK build only if you decide to opt-in for the New Architecture.
         externalNativeBuild {
@@ -216,6 +251,7 @@ android {
     }
 
     splits {
+
         abi {
             reset()
             enable enableSeparateBuildPerCPUArchitecture
@@ -251,7 +287,7 @@ android {
             // https://developer.android.com/studio/build/configure-apk-splits.html
             // Example: versionCode 1 will generate 1001 for armeabi-v7a, 1002 for x86, etc.
             def versionCodes = ["armeabi-v7a": 1, "x86": 2, "arm64-v8a": 3, "x86_64": 4]
-            def abi = output.getFilter(OutputFile.ABI)
+            def abi = output.getFilter(com.android.build.OutputFile.ABI)
             if (abi != null) {  // null for the universal-debug, universal-release variants
                 output.versionCodeOverride =
                         defaultConfig.versionCode * 1000 + versionCodes.get(abi)
@@ -264,10 +300,14 @@ android {
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
 
+
     //noinspection GradleDynamicVersion
     implementation "com.facebook.react:react-native:+"  // From node_modules
-
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0") 
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
+    implementation("com.google.firebase:firebase-crashlytics")
+    implementation("com.google.firebase:firebase-analytics")
+    implementation(platform("com.google.firebase:firebase-bom:33.1.1"))
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
         exclude group:'com.facebook.fbjni'

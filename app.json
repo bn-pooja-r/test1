@@ -1,4 +1,8 @@
 {
   "name": "test1",
-  "displayName": "test1"
+  "displayName": "test1",
+  "plugins": [
+      "@react-native-firebase/app",
+      "@react-native-firebase/crashlytics"
+    ]
 }
