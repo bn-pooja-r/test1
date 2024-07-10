@@ -3,6 +3,18 @@ apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
 apply plugin: 'com.google.firebase.appdistribution'
 apply plugin: 'com.google.firebase.firebase-perf'
+
+
+project.ext.envConfigFiles = [
+   productiondebug: ".env.production",
+   productionrelease: ".env.production",
+   stagingrelease: ".env.staging",
+   stagingdebug: ".env.staging"
+]
+apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
+
+
+
 import com.android.build.OutputFile
 import org.apache.tools.ant.taskdefs.condition.Os
 
@@ -182,7 +194,21 @@ android {
             }
         }
     }
-
+    flavorDimensions "default"
+    productFlavors {
+            production {
+                minSdkVersion rootProject.ext.minSdkVersion
+                applicationId "com.test1"
+                targetSdkVersion rootProject.ext.targetSdkVersion
+                resValue "string", "build_config_package", "com.test1"
+            }
+            staging {
+                minSdkVersion rootProject.ext.minSdkVersion
+                applicationId "com.teststaging"
+                targetSdkVersion rootProject.ext.targetSdkVersion
+                resValue "string", "build_config_package", "com.teststaging"
+            }
+        }
     if (isNewArchitectureEnabled()) {
         // We configure the NDK build only if you decide to opt-in for the New Architecture.
         externalNativeBuild {
@@ -225,6 +251,7 @@ android {
     }
 
     splits {
+
         abi {
             reset()
             enable enableSeparateBuildPerCPUArchitecture
